@@ -39,8 +39,8 @@ export default function ToolCantamPage() {
               </p>
               <p className="toolbox__text">
                 Tüm işlemler <strong>client-side</strong> çalışır. Verileriniz asla sunucuya 
-                gitmez, bilgisayarınızdan dışarı çıkmaz. Bu sayede <strong>veri gizliliğiniz</strong> 
-                tamamen korunur.
+                gitmez, bilgisayarınızdan dışarı çıkmaz. Bu sayede <strong>veri gizliliğiniz </strong> 
+                 tamamen korunur.
               </p>
               <div className="toolbox__tags">
                 <span className="toolbox__tag">WPF</span>
