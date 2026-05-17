@@ -15,16 +15,18 @@ interface Project {
   featured: boolean;
 }
 
-// Icon mapping
 const iconMap: Record<string, IconDefinition> = {
   faToolbox: faToolbox,
   faGamepad: faGamepad,
   faPalette: faPalette,
 };
 
+// API'yi çağır - Vercel'de de çalışsın
 async function getProjects(): Promise<Project[]> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/projects`, {
+    // Vercel'de ortam değişkeni yoksa fallback ekle
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://naz-blog.vercel.app';
+    const res = await fetch(`${baseUrl}/api/projects`, {
       cache: 'no-store'
     });
     const data = await res.json();
@@ -89,29 +91,33 @@ export default async function Home() {
               <span>Projelerim</span>
             </h2>
             <div className="projects__grid">
-              {projects.map((project: Project) => (
-                <div key={project.id} className="card">
-                  <div className="card__icon">
-                    <FontAwesomeIcon icon={iconMap[project.icon] || faToolbox} className="card-icon" />
+              {projects.length === 0 ? (
+                <p style={{ color: "var(--text-muted)", textAlign: "center" }}>Projeler yükleniyor...</p>
+              ) : (
+                projects.map((project: Project) => (
+                  <div key={project.id} className="card">
+                    <div className="card__icon">
+                      <FontAwesomeIcon icon={iconMap[project.icon] || faToolbox} className="card-icon" />
+                    </div>
+                    <h3 className="card__title">{project.title}</h3>
+                    <p className="card__description">{project.description}</p>
+                    <div className="card__tech">
+                      {project.tech.map((t: string) => (
+                        <span key={t} className="card__tech-item">{t}</span>
+                      ))}
+                    </div>
+                    {project.link ? (
+                      <Link href={project.link} className="card__link">
+                        Detaylar →
+                      </Link>
+                    ) : (
+                      <span className="card__link" style={{ opacity: 0.5, cursor: "default" }}>
+                        Yakında →
+                      </span>
+                    )}
                   </div>
-                  <h3 className="card__title">{project.title}</h3>
-                  <p className="card__description">{project.description}</p>
-                  <div className="card__tech">
-                    {project.tech.map((t: string) => (
-                      <span key={t} className="card__tech-item">{t}</span>
-                    ))}
-                  </div>
-                  {project.link ? (
-                    <Link href={project.link} className="card__link">
-                      Detaylar →
-                    </Link>
-                  ) : (
-                    <span className="card__link" style={{ opacity: 0.5, cursor: "default" }}>
-                      Yakında →
-                    </span>
-                  )}
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </section>
