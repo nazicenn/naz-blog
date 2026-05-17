@@ -1,38 +1,86 @@
-<<<<<<< HEAD
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Naz İçen | Personal Blog & Portfolio
 
-## Getting Started
+Modern, fast and customizable personal blog & portfolio web application built with a scalable full-stack architecture.
 
-First, run the development server:
+![Website](https://img.shields.io/badge/website-live-green)
+![Next.js](https://img.shields.io/badge/Next.js-16-black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+![Supabase](https://img.shields.io/badge/Supabase-auth%20%26%20db-green)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+##  Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+-  Built with **Next.js 16 (App Router)**
+-  Modern UI design (Deep Navy + Turquoise theme)
+-  Authentication system powered by **Supabase Auth**
+-  Advanced comment system  
+  (add, delete, edit, like, reply, collapse threads)
+-  Fully functional **Admin Panel**
+  - Blog management
+  - Project management
+  - Comment moderation
+-  Markdown-based blog system
+-  Dynamic project system (JSON-driven architecture)
+-  Fully responsive design (mobile-first approach)
+-  Profanity filter for user-generated content
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+##  Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+**Frontend**
+- Next.js 16
+- React 19
+- TypeScript
+- TailwindCSS
+- CSS Modules
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Backend / Services**
+- Supabase (Authentication + Database)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Utilities**
+- gray-matter (Markdown parsing)
+- react-markdown (Markdown rendering)
+- Font Awesome (Icons)
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+##  Project Structure
+├── app/ # Next.js App Router
+│ ├── admin/ # Admin panel
+│ ├── blog/ # Blog pages
+│ ├── profile/ # User profile
+│ └── api/ # API routes
+├── components/ # Reusable React components
+├── lib/ # Utility functions
+├── content/ # Markdown blog posts
+├── data/ # JSON-based project data
+└── public/ # Static assets
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-=======
+
+---
+
+##  Live Demo
+
+ https://naz-blog.vercel.app
+
+---
+
+##  Developer
+
+**Naz İçen**
+- Game Developer & 1st Year Computer Programming Student
+- Creator of "Tool Çantam" project ecosystem
+
+---
+
+##  License
+
+This project is licensed under the **MIT License**.
+
+---
+
+##  Support
+
+If you like this project, please consider giving it a ⭐ on GitHub.
