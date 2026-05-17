@@ -1,0 +1,50 @@
+[
+  {
+    "id": "tool-cantam",
+    "title": "Tool Çantam",
+    "description": "WPF ile geliştirilmiş, 70+ geliştirici aracını tek platformda toplayan client-side uygulama.",
+    "detailedDescription": "Tool Çantam, geliştiricilerin günlük ihtiyaç duyabileceği şifreleme, dönüştürme, ağ araçları ve daha fazlasını bir araya getiren bir WPF masaüstü uygulamasıdır. Tüm işlemler client-side çalışır, verileriniz asla sunucuya gitmez.",
+    "icon": "faToolbox",
+    "tech": [
+      "WPF",
+      "C#",
+      ".NET",
+      "MVVM",
+      "70+ Tool"
+    ],
+    "link": "/tool-cantam",
+    "featured": true,
+    "github": "https://github.com/nazicen/tool-cantam",
+    "created_at": "2024-01-01"
+  },
+  {
+    "id": "unity-projects",
+    "title": "Unity Oyun Projeleri",
+    "description": "3D ve 2D oyun geliştirme üzerine çalışıyorum.",
+    "detailedDescription": "Unity ile hem 2D hem de 3D oyun geliştirme üzerine çalışıyorum. İlk tam oyunumu çıkarmak için sabırsızlanıyorum. Bu süreçte oyun tasarımı, mekanikler ve optimizasyon konularında deneyim kazanıyorum.",
+    "icon": "faGamepad",
+    "tech": [
+      "Unity",
+      "C#",
+      "3D Modeling"
+    ],
+    "link": null,
+    "featured": false,
+    "created_at": "2024-02-01"
+  },
+  {
+    "id": "blender",
+    "title": "Blender 3D Tasarım",
+    "description": "Modelleme, texture ve animasyon alanlarında kendimi geliştiriyorum.",
+    "detailedDescription": "Blender ile 3D modelleme, texture mapping ve animasyon alanlarında çalışıyorum. Oyun projelerim için asset oluşturma ve görselleştirme projeleri üzerinde ilerliyorum.",
+    "icon": "faPalette",
+    "tech": [
+      "Blender",
+      "3D Modeling",
+      "Texture"
+    ],
+    "link": null,
+    "featured": false,
+    "created_at": "2024-03-01"
+  }
+]
