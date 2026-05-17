@@ -1,10 +1,10 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BlogCard from "@/components/BlogCard";
-import { getAllPosts, Post } from "@/lib/posts";
+import { getAllPosts } from "@/lib/posts";
 
-export default function BlogPage() {
-  const posts = getAllPosts();
+export default async function BlogPage() {
+  const posts = await getAllPosts();
 
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
@@ -21,7 +21,7 @@ export default function BlogPage() {
             <p>Henüz blog yazısı yok. İlk yazı yakında gelecek!</p>
           ) : (
             <div className="projects__grid">
-              {posts.map((post: Post) => (
+              {posts.map((post) => (
                 <BlogCard key={post.slug} post={post} />
               ))}
             </div>

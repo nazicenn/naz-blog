@@ -1,34 +1,32 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
-import matter from "gray-matter";
+import { createClient } from "@/lib/supabase/server";
+
+interface BlogPost {
+  slug: string;
+  title: string;
+  created_at: string;
+  category: string;
+}
 
 export async function GET() {
   try {
-    const postsDirectory = path.join(process.cwd(), "content/posts");
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("blog_posts")
+      .select("*")
+      .order("created_at", { ascending: false });
     
-    if (!fs.existsSync(postsDirectory)) {
-      return NextResponse.json({ posts: [] });
-    }
+    if (error) throw error;
     
-    const fileNames = fs.readdirSync(postsDirectory);
-    const posts = fileNames.map((fileName) => {
-      const slug = fileName.replace(/\.md$/, "");
-      const fullPath = path.join(postsDirectory, fileName);
-      const fileContents = fs.readFileSync(fullPath, "utf8");
-      const { data } = matter(fileContents);
-      
-      return {
-        slug,
-        title: data.title || "Başlıksız",
-        date: data.date || new Date().toISOString().split('T')[0],
-        category: data.category || "Genel",
-      };
-    });
+    const posts = (data || []).map((post: BlogPost) => ({
+      slug: post.slug,
+      title: post.title,
+      date: new Date(post.created_at).toISOString().split('T')[0],
+      category: post.category,
+    }));
     
-    return NextResponse.json({ posts: posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) });
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (_error) {
+    return NextResponse.json({ posts });
+  } catch {
     return NextResponse.json({ posts: [] });
   }
 }

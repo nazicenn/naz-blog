@@ -1,71 +1,92 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
-
-interface Project {
-  id: string;
-  title: string;
-  description: string;
-  detailedDescription?: string;
-  icon: string;
-  tech: string[];
-  link: string | null;
-  featured: boolean;
-  images?: string[];
-  github?: string;
-  demo?: string;
-}
-
-const dataPath = path.join(process.cwd(), "data/projects.json");
-
-function readProjects(): Project[] {
-  if (!fs.existsSync(dataPath)) {
-    return [];
-  }
-  const data = fs.readFileSync(dataPath, "utf8");
-  return JSON.parse(data);
-}
-
-function writeProjects(projects: Project[]): void {
-  fs.writeFileSync(dataPath, JSON.stringify(projects, null, 2), "utf8");
-}
+import { createClient } from "@/lib/supabase/server";
 
 // GET - Tüm projeleri veya tek projeyi al
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get("id");
-  const projects = readProjects();
-  
-  if (id) {
-    const project = projects.find(p => p.id === id);
-    return NextResponse.json({ project: project || null });
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    const supabase = await createClient();
+    
+    if (id) {
+      const { data, error } = await supabase
+        .from("projects")
+        .select("*")
+        .eq("id", id)
+        .single();
+      
+      if (error) throw error;
+      return NextResponse.json({ project: data || null });
+    }
+    
+    const { data, error } = await supabase
+      .from("projects")
+      .select("*")
+      .order("created_at", { ascending: false });
+    
+    if (error) throw error;
+    return NextResponse.json({ projects: data || [] });
+  } catch {
+    return NextResponse.json({ projects: [] });
   }
-  
-  return NextResponse.json({ projects });
 }
 
 // POST - Yeni proje ekle veya güncelle
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const projects = readProjects();
+    const supabase = await createClient();
     
-    if (body.id) {
-      const index = projects.findIndex((p: Project) => p.id === body.id);
-      if (index !== -1) {
-        projects[index] = { ...projects[index], ...body };
-      } else {
-        projects.push(body);
-      }
-    } else {
-      const newId = body.title.toLowerCase().replace(/[^a-z0-9]/g, '-');
-      projects.push({ ...body, id: newId });
+    // Admin kontrolü
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user?.email !== "nazfc7@gmail.com") {
+      return NextResponse.json({ error: "Yetkisiz erişim" }, { status: 401 });
     }
     
-    writeProjects(projects);
-    return NextResponse.json({ success: true, projects });
-  } catch {
-    return NextResponse.json({ error: "Proje kaydedilemedi" }, { status: 500 });
+    if (body.id) {
+      // Güncelleme
+      const { error } = await supabase
+        .from("projects")
+        .update({
+          title: body.title,
+          description: body.description,
+          detailed_description: body.detailedDescription,
+          icon: body.icon,
+          tech: body.tech,
+          link: body.link,
+          featured: body.featured,
+          github: body.github,
+          demo: body.demo,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", body.id);
+      
+      if (error) throw error;
+    } else {
+      // Yeni proje
+      const newId = body.title.toLowerCase().replace(/[^a-z0-9]/g, '-');
+      const { error } = await supabase
+        .from("projects")
+        .insert({
+          id: newId,
+          title: body.title,
+          description: body.description,
+          detailed_description: body.detailedDescription,
+          icon: body.icon,
+          tech: body.tech,
+          link: body.link,
+          featured: body.featured,
+          github: body.github,
+          demo: body.demo
+        });
+      
+      if (error) throw error;
+    }
+    
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Proje kaydedilemedi";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 
@@ -79,12 +100,24 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "ID gerekli" }, { status: 400 });
     }
     
-    const projects = readProjects();
-    const filtered = projects.filter((p: Project) => p.id !== id);
-    writeProjects(filtered);
+    const supabase = await createClient();
+    
+    // Admin kontrolü
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user?.email !== "nazfc7@gmail.com") {
+      return NextResponse.json({ error: "Yetkisiz erişim" }, { status: 401 });
+    }
+    
+    const { error } = await supabase
+      .from("projects")
+      .delete()
+      .eq("id", id);
+    
+    if (error) throw error;
     
     return NextResponse.json({ success: true });
-  } catch {
-    return NextResponse.json({ error: "Proje silinemedi" }, { status: 500 });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Proje silinemedi";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

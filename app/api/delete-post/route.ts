@@ -1,23 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
   try {
     const { slug } = await request.json();
+    const supabase = await createClient();
     
-    const postsDirectory = path.join(process.cwd(), "content/posts");
-    const filePath = path.join(postsDirectory, `${slug}.md`);
-    
-    if (!fs.existsSync(filePath)) {
-      return NextResponse.json({ error: "Dosya bulunamadı" }, { status: 404 });
+    // Admin kontrolü
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user?.email !== "nazfc7@gmail.com") {
+      return NextResponse.json({ error: "Yetkisiz erişim" }, { status: 401 });
     }
     
-    fs.unlinkSync(filePath);
+    const { error } = await supabase
+      .from("blog_posts")
+      .delete()
+      .eq("slug", slug);
+    
+    if (error) throw error;
     
     return NextResponse.json({ success: true });
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (_error) {
-    return NextResponse.json({ error: "Dosya silinemedi" }, { status: 500 });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Dosya silinemedi";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

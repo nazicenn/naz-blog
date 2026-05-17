@@ -1,30 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const { slug, markdown } = await request.json();
+    const { slug, title, content, category, summary, author } = await request.json();
+    const supabase = await createClient();
     
-    const postsDirectory = path.join(process.cwd(), "content/posts");
-    
-    // Klasör yoksa oluştur
-    if (!fs.existsSync(postsDirectory)) {
-      fs.mkdirSync(postsDirectory, { recursive: true });
+    // Admin kontrolü
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user?.email !== "nazfc7@gmail.com") {
+      return NextResponse.json({ error: "Yetkisiz erişim" }, { status: 401 });
     }
     
-    const filePath = path.join(postsDirectory, `${slug}.md`);
+    const { error } = await supabase
+      .from("blog_posts")
+      .insert({ slug, title, content, category, summary, author });
     
-    // Dosya zaten varsa
-    if (fs.existsSync(filePath)) {
-      return NextResponse.json({ error: "Bu başlıkla zaten bir yazı var!" }, { status: 400 });
-    }
-    
-    fs.writeFileSync(filePath, markdown, "utf8");
+    if (error) throw error;
     
     return NextResponse.json({ success: true });
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (_error) {
-    return NextResponse.json({ error: "Dosya kaydedilemedi" }, { status: 500 });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Yazı oluşturulamadı";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
