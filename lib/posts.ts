@@ -15,26 +15,6 @@ export interface Post {
 // 📌 Blog yazılarını burada doğrudan tanımlıyoruz (JSON dosyası yok!)
 const BLOG_POSTS: Post[] = [
   {
-    slug: "merhaba-dunya",
-    title: "Merhaba Dünya",
-    date: "2026-05-17",
-    author: "Naz İçen",
-    category: "Kişisel",
-    summary: "İlk blog yazıma hoş geldiniz.",
-    coverImage: "/images/placeholder.jpg",
-    content: `# Merhaba Dünya!
-
-Bu benim ilk blog yazım. Bu blogda yazılım geliştirme, oyun tasarımı ve araç geliştirme üzerine yazılar paylaşacağım.
-
-## Neler bulacaksın?
-
-*   C# ipuçları
-*   Unity ile oyun geliştirme
-*   Blender ile 3D modelleme
-
-Takipte kal!`,
-  },
-  {
     slug: "typescript-ile-web-gelistirme",
     title: "TypeScript ile Modern Web Geliştirme",
     date: "2026-05-17",
