@@ -142,6 +142,7 @@ TypeScript, modern web geliştirme süreçlerinde artık bir lüks değil, gerek
 Eğer React veya Next.js geliştiriyorsanız, TypeScript öğrenmek size büyük avantaj sağlayacaktır.
 `,
 }
+  ];
 // Tüm yazıları döndürür (build zamanı cache'lenir)
 export const getAllPosts = cache((): Post[] => {
   // Tarihe göre sırala (en yeniden en eskiye)
