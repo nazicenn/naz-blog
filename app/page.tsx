@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faToolbox, faGamepad, faPalette } from "@fortawesome/free-solid-svg-icons";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import projectsData from "@/data/projects.json";
 
 interface Project {
   id: string;
@@ -21,23 +22,8 @@ const iconMap: Record<string, IconDefinition> = {
   faPalette: faPalette,
 };
 
-// API'yi çağır - Vercel'de de çalışsın
-async function getProjects(): Promise<Project[]> {
-  try {
-    // Vercel'de ortam değişkeni yoksa fallback ekle
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://naz-blog.vercel.app';
-    const res = await fetch(`${baseUrl}/api/projects`, {
-      cache: 'no-store'
-    });
-    const data = await res.json();
-    return data.projects || [];
-  } catch {
-    return [];
-  }
-}
-
 export default async function Home() {
-  const projects = await getProjects();
+  const projects = projectsData as Project[];
 
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
@@ -91,33 +77,29 @@ export default async function Home() {
               <span>Projelerim</span>
             </h2>
             <div className="projects__grid">
-              {projects.length === 0 ? (
-                <p style={{ color: "var(--text-muted)", textAlign: "center" }}>Projeler yükleniyor...</p>
-              ) : (
-                projects.map((project: Project) => (
-                  <div key={project.id} className="card">
-                    <div className="card__icon">
-                      <FontAwesomeIcon icon={iconMap[project.icon] || faToolbox} className="card-icon" />
-                    </div>
-                    <h3 className="card__title">{project.title}</h3>
-                    <p className="card__description">{project.description}</p>
-                    <div className="card__tech">
-                      {project.tech.map((t: string) => (
-                        <span key={t} className="card__tech-item">{t}</span>
-                      ))}
-                    </div>
-                    {project.link ? (
-                      <Link href={project.link} className="card__link">
-                        Detaylar →
-                      </Link>
-                    ) : (
-                      <span className="card__link" style={{ opacity: 0.5, cursor: "default" }}>
-                        Yakında →
-                      </span>
-                    )}
+              {projects.map((project: Project) => (
+                <div key={project.id} className="card">
+                  <div className="card__icon">
+                    <FontAwesomeIcon icon={iconMap[project.icon] || faToolbox} className="card-icon" />
                   </div>
-                ))
-              )}
+                  <h3 className="card__title">{project.title}</h3>
+                  <p className="card__description">{project.description}</p>
+                  <div className="card__tech">
+                    {project.tech.map((t: string) => (
+                      <span key={t} className="card__tech-item">{t}</span>
+                    ))}
+                  </div>
+                  {project.link ? (
+                    <Link href={project.link} className="card__link">
+                      Detaylar →
+                    </Link>
+                  ) : (
+                    <span className="card__link" style={{ opacity: 0.5, cursor: "default" }}>
+                      Yakında →
+                    </span>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </section>
