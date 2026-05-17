@@ -57,7 +57,7 @@ export default async function Home() {
               </h1>
               <p className="hero__subtitle">
                 Unity ve Blender ile oyun projeleri üretiyorum.
-                Yazılım dünyasında kolaylık sağlayayacak işler yapıyorum.
+                Yazılım dünyasında kolaylık sağlayacak işler yapıyorum.
               </p>
               <div className="btn-group">
                 <Link href="/blog" className="btn btn--primary">
@@ -75,7 +75,7 @@ export default async function Home() {
               <span>Teknolojiler</span> ve İlgi Alanlarım
             </h2>
             <div className="skills__grid">
-              {[, "C# & .NET", "Unity", "Blender","Figma", "UI/UX", ].map((skill) => (
+              {["C# & .NET", "Unity", "Blender", "Figma", "UI/UX"].map((skill) => (
                 <span key={skill} className="skills__item">{skill}</span>
               ))}
             </div>
