@@ -1,5 +1,5 @@
-import fs from "fs";
-import path from "path";
+// lib/posts.ts
+import { cache } from 'react';
 
 export interface Post {
   slug: string;
@@ -12,82 +12,64 @@ export interface Post {
   content: string;
 }
 
-interface BlogPostData {
-  id: string;
-  slug: string;
-  title: string;
-  content: string;
-  summary: string;
-  category: string;
-  author: string;
-  date: string;
-  coverImage: string;
-}
+// 📌 Blog yazılarını burada doğrudan tanımlıyoruz (JSON dosyası yok!)
+const BLOG_POSTS: Post[] = [
+  {
+    slug: "merhaba-dunya",
+    title: "Merhaba Dünya",
+    date: "2026-05-17",
+    author: "Naz İçen",
+    category: "Kişisel",
+    summary: "İlk blog yazıma hoş geldiniz.",
+    coverImage: "/images/placeholder.jpg",
+    content: `# Merhaba Dünya!
 
-const postsPath = path.join(process.cwd(), "data/blog-posts.json");
+Bu benim ilk blog yazım. Bu blogda yazılım geliştirme, oyun tasarımı ve araç geliştirme üzerine yazılar paylaşacağım.
 
-function readPosts(): BlogPostData[] {
-  if (!fs.existsSync(postsPath)) {
-    return [];
+## Neler bulacaksın?
+
+*   C# ipuçları
+*   Unity ile oyun geliştirme
+*   Blender ile 3D modelleme
+
+Takipte kal!`,
+  },
+  {
+    slug: "typescript-ile-web-gelistirme",
+    title: "TypeScript ile Modern Web Geliştirme",
+    date: "2026-05-17",
+    author: "Naz İçen",
+    category: "Yazılım",
+    summary: "TypeScript'in web geliştirmedeki önemini ve temel kullanım alanlarını keşfedin.",
+    coverImage: "/images/placeholder.jpg",
+    content: `# TypeScript ile Modern Web Geliştirme
+
+TypeScript, JavaScript'in tip güvenli bir süper setidir.
+
+## Neden TypeScript?
+
+- **Tip Güvenliği**: Hataları geliştirme aşamasında yakalayın.
+- **IDE Desteği**: Otomatik tamamlama ve refactoring.
+
+## Temel Tipler
+
+\`\`\`typescript
+let isActive: boolean = true;
+let skills: string[] = ["React", "Next.js"];
+interface User { name: string; }
+\`\`\`
+
+TypeScript ile daha sağlam kodlar yazabilirsiniz!`,
   }
-  const data = fs.readFileSync(postsPath, "utf8");
-  return JSON.parse(data);
-}
+];
 
-function writePosts(posts: BlogPostData[]): void {
-  fs.writeFileSync(postsPath, JSON.stringify(posts, null, 2), "utf8");
-}
+// Tüm yazıları döndürür (build zamanı cache'lenir)
+export const getAllPosts = cache((): Post[] => {
+  // Tarihe göre sırala (en yeniden en eskiye)
+  return [...BLOG_POSTS].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+});
 
-export function getAllPosts(): Post[] {
-  const posts = readPosts();
-  return posts.map((post: BlogPostData) => ({
-    slug: post.slug,
-    title: post.title,
-    date: post.date,
-    author: post.author,
-    category: post.category,
-    summary: post.summary,
-    coverImage: post.coverImage,
-    content: post.content,
-  }));
-}
-
-export function getPostBySlug(slug: string): Post | null {
-  const posts = readPosts();
-  const post = posts.find((p: BlogPostData) => p.slug === slug);
-  if (!post) return null;
-  
-  return {
-    slug: post.slug,
-    title: post.title,
-    date: post.date,
-    author: post.author,
-    category: post.category,
-    summary: post.summary,
-    coverImage: post.coverImage,
-    content: post.content,
-  };
-}
-
-export function addPost(post: Post): void {
-  const posts = readPosts();
-  const newPost: BlogPostData = {
-    id: Date.now().toString(),
-    slug: post.slug,
-    title: post.title,
-    content: post.content,
-    summary: post.summary,
-    category: post.category,
-    author: post.author,
-    date: post.date,
-    coverImage: post.coverImage,
-  };
-  posts.push(newPost);
-  writePosts(posts);
-}
-
-export function deletePost(slug: string): void {
-  const posts = readPosts();
-  const filtered = posts.filter((post: BlogPostData) => post.slug !== slug);
-  writePosts(filtered);
-}
+// Belli bir slug'a göre yazıyı döndürür
+export const getPostBySlug = cache((slug: string): Post | null => {
+  return getAllPosts().find((post) => post.slug === slug) || null;
+});
