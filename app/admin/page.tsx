@@ -88,17 +88,15 @@ export default function AdminPage() {
   ];
 
   // Blog yazılarını getir
-  const fetchBlogPosts = async () => {
-    try {
-      const response = await fetch('/api/get-posts');
-      const data = await response.json();
-      if (data.posts) {
-        setBlogPosts(data.posts);
-      }
-    } catch (error) {
-      console.error("Blog yazıları yüklenemedi:", error);
-    }
-  };
+const fetchBlogPosts = async () => {
+  try {
+    const response = await fetch('/api/blog-posts');
+    const data = await response.json();
+    setBlogPosts(data.posts || []);
+  } catch (error) {
+    console.error("Blog yazıları yüklenemedi:", error);
+  }
+};
 
   // Projeleri getir
   const fetchProjects = async () => {
@@ -175,86 +173,81 @@ export default function AdminPage() {
     }
   };
 
-  // Blog yazısı sil
-  const deleteBlogPost = async (slug: string, title: string) => {
-    if (!confirm(`"${title}" yazısını silmek istediğine emin misin?`)) return;
-    
-    try {
-      const response = await fetch('/api/delete-post', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug })
-      });
-      
-      if (response.ok) {
-        alert("Blog yazısı başarıyla silindi!");
-        await fetchBlogPosts();
-      } else {
-        alert("Silme işlemi başarısız oldu.");
-      }
-    } catch (error) {
-      alert("Hata: " + error);
+const deleteBlogPost = async (slug: string, title: string) => {
+  if (!confirm(`"${title}" yazısını silmek istediğine emin misin?`)) return;
+  
+  try {
+    const response = await fetch(`/api/blog-posts?slug=${slug}`, { method: 'DELETE' });
+    if (response.ok) {
+      alert("Blog yazısı başarıyla silindi!");
+      await fetchBlogPosts();
+    } else {
+      alert("Silme işlemi başarısız oldu.");
     }
+  } catch (error) {
+    alert("Hata: " + error);
+  }
+};
+
+// Blog yazısı oluştur (JSON tabanlı)
+const createBlogPost = async () => {
+  if (!postTitle.trim() || !postContent.trim()) {
+    alert("Başlık ve içerik zorunludur!");
+    return;
+  }
+
+  setSavingPost(true);
+  
+  const slug = postTitle
+    .toLowerCase()
+    .replace(/ğ/g, 'g')
+    .replace(/ü/g, 'u')
+    .replace(/ş/g, 's')
+    .replace(/ı/g, 'i')
+    .replace(/ö/g, 'o')
+    .replace(/ç/g, 'c')
+    .replace(/[^a-z0-9]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+
+  const summary = postSummary || postContent.slice(0, 150) + "...";
+  const date = new Date().toISOString().split('T')[0];
+  const author = user?.user_metadata?.username || user?.email?.split('@')[0] || "Admin";
+
+  const newPost = {
+    id: Date.now().toString(),
+    slug,
+    title: postTitle,
+    content: postContent,
+    summary,
+    category: postCategory,
+    author,
+    date,
+    coverImage: "/images/placeholder.jpg"
   };
 
-  // Blog yazısı oluştur
-  const createBlogPost = async () => {
-    if (!postTitle.trim() || !postContent.trim()) {
-      alert("Başlık ve içerik zorunludur!");
-      return;
+  try {
+    const response = await fetch('/api/blog-posts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newPost)
+    });
+
+    if (response.ok) {
+      alert("Blog yazısı başarıyla oluşturuldu!");
+      setPostTitle("");
+      setPostContent("");
+      setPostSummary("");
+      setShowPostForm(false);
+      await fetchBlogPosts();
+    } else {
+      alert("Yazı oluşturulurken bir hata oluştu.");
     }
-
-    setSavingPost(true);
-    
-    const slug = postTitle
-      .toLowerCase()
-      .replace(/ğ/g, 'g')
-      .replace(/ü/g, 'u')
-      .replace(/ş/g, 's')
-      .replace(/ı/g, 'i')
-      .replace(/ö/g, 'o')
-      .replace(/ç/g, 'c')
-      .replace(/[^a-z0-9]/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '');
-
-    const summary = postSummary || postContent.slice(0, 150) + "...";
-    const date = new Date().toISOString().split('T')[0];
-
-    const markdown = `---
-title: "${postTitle}"
-date: "${date}"
-author: "${user?.user_metadata?.username || user?.email?.split('@')[0]}"
-category: "${postCategory}"
-summary: "${summary}"
-coverImage: "/images/placeholder.jpg"
----
-
-${postContent}`;
-
-    try {
-      const response = await fetch('/api/create-post', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug, markdown })
-      });
-
-      if (response.ok) {
-        alert("Blog yazısı başarıyla oluşturuldu!");
-        setPostTitle("");
-        setPostContent("");
-        setPostSummary("");
-        setShowPostForm(false);
-        await fetchBlogPosts();
-      } else {
-        alert("Yazı oluşturulurken bir hata oluştu.");
-      }
-    } catch (error) {
-      alert("Hata: " + error);
-    }
-    setSavingPost(false);
-  };
-
+  } catch (error) {
+    alert("Hata: " + error);
+  }
+  setSavingPost(false);
+};
   // Proje kaydet
   const saveProject = async () => {
     if (!projectTitle.trim() || !projectDescription.trim()) {

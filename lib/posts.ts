@@ -1,8 +1,5 @@
 import fs from "fs";
 import path from "path";
-import matter from "gray-matter";
-
-const postsDirectory = path.join(process.cwd(), "content/posts");
 
 export interface Post {
   slug: string;
@@ -15,57 +12,82 @@ export interface Post {
   content: string;
 }
 
-export function getAllPosts(): Post[] {
-  // Klasör yoksa boş dizi döndür
-  if (!fs.existsSync(postsDirectory)) {
+interface BlogPostData {
+  id: string;
+  slug: string;
+  title: string;
+  content: string;
+  summary: string;
+  category: string;
+  author: string;
+  date: string;
+  coverImage: string;
+}
+
+const postsPath = path.join(process.cwd(), "data/blog-posts.json");
+
+function readPosts(): BlogPostData[] {
+  if (!fs.existsSync(postsPath)) {
     return [];
   }
-  
-  const fileNames = fs.readdirSync(postsDirectory);
-  
-  const posts = fileNames.map((fileName) => {
-    const slug = fileName.replace(/\.md$/, "");
-    const fullPath = path.join(postsDirectory, fileName);
-    const fileContents = fs.readFileSync(fullPath, "utf8");
-    const { data, content } = matter(fileContents);
+  const data = fs.readFileSync(postsPath, "utf8");
+  return JSON.parse(data);
+}
 
-    return {
-      slug,
-      title: data.title || "Başlıksız",
-      date: data.date || new Date().toISOString().split("T")[0],
-      author: data.author || "Naz İçen",
-      category: data.category || "Genel",
-      summary: data.summary || content.slice(0, 150) + "...",
-      coverImage: data.coverImage || "/images/placeholder.jpg",
-      content,
-    };
-  });
+function writePosts(posts: BlogPostData[]): void {
+  fs.writeFileSync(postsPath, JSON.stringify(posts, null, 2), "utf8");
+}
 
-  return posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+export function getAllPosts(): Post[] {
+  const posts = readPosts();
+  return posts.map((post: BlogPostData) => ({
+    slug: post.slug,
+    title: post.title,
+    date: post.date,
+    author: post.author,
+    category: post.category,
+    summary: post.summary,
+    coverImage: post.coverImage,
+    content: post.content,
+  }));
 }
 
 export function getPostBySlug(slug: string): Post | null {
-  try {
-    const fullPath = path.join(postsDirectory, `${slug}.md`);
-    
-    if (!fs.existsSync(fullPath)) {
-      return null;
-    }
-    
-    const fileContents = fs.readFileSync(fullPath, "utf8");
-    const { data, content } = matter(fileContents);
+  const posts = readPosts();
+  const post = posts.find((p: BlogPostData) => p.slug === slug);
+  if (!post) return null;
+  
+  return {
+    slug: post.slug,
+    title: post.title,
+    date: post.date,
+    author: post.author,
+    category: post.category,
+    summary: post.summary,
+    coverImage: post.coverImage,
+    content: post.content,
+  };
+}
 
-    return {
-      slug,
-      title: data.title || "Başlıksız",
-      date: data.date || new Date().toISOString().split("T")[0],
-      author: data.author || "Naz İçen",
-      category: data.category || "Genel",
-      summary: data.summary || content.slice(0, 150) + "...",
-      coverImage: data.coverImage || "/images/placeholder.jpg",
-      content,
-    };
-  } catch {
-    return null;
-  }
+export function addPost(post: Post): void {
+  const posts = readPosts();
+  const newPost: BlogPostData = {
+    id: Date.now().toString(),
+    slug: post.slug,
+    title: post.title,
+    content: post.content,
+    summary: post.summary,
+    category: post.category,
+    author: post.author,
+    date: post.date,
+    coverImage: post.coverImage,
+  };
+  posts.push(newPost);
+  writePosts(posts);
+}
+
+export function deletePost(slug: string): void {
+  const posts = readPosts();
+  const filtered = posts.filter((post: BlogPostData) => post.slug !== slug);
+  writePosts(filtered);
 }
