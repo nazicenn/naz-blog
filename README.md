@@ -1,168 +1,209 @@
-# Naz İçen | Personal Blog & Portfolio 
+# Naz İçen | Blog & Portfolio System
 
-[![Website Live](https://img.shields.io/badge/Website-Live-00f2fe?style=for-the-badge\&logo=vercel\&logoColor=white)](https://naz-blog.vercel.app)
-[![Next.js](https://img.shields.io/badge/Next.js-App%20Router-black?style=for-the-badge\&logo=nextdotjs\&logoColor=white)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19-20232A?style=for-the-badge\&logo=react\&logoColor=61DAFB)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge\&logo=typescript\&logoColor=white)](https://www.typescriptlang.org/)
-[![Supabase](https://img.shields.io/badge/Supabase-Auth%20%26%20Database-3ECF8E?style=for-the-badge\&logo=supabase\&logoColor=white)](https://supabase.com/)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?style=for-the-badge\&logo=tailwindcss\&logoColor=white)](https://tailwindcss.com/)
+[![Deployment](https://img.shields.io/badge/Deployment-Vercel-000000?style=for-the-badge\&logo=vercel)](https://naz-blog.vercel.app)
+[![Framework](https://img.shields.io/badge/Next.js-App%20Router-000000?style=for-the-badge\&logo=nextdotjs)](https://nextjs.org/)
+[![Runtime](https://img.shields.io/badge/React-19-20232A?style=for-the-badge\&logo=react)](https://react.dev/)
+[![Language](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge\&logo=typescript)](https://www.typescriptlang.org/)
+[![Backend](https://img.shields.io/badge/Supabase-Postgres%20%2B%20Auth-3ECF8E?style=for-the-badge\&logo=supabase)](https://supabase.com/)
 
-A modern personal blog and portfolio application built with Next.js, React, TypeScript, and Supabase.
+A full-stack blog and portfolio system built with a server-centric architecture using Next.js App Router and Supabase (PostgreSQL + Auth).
 
-The project focuses on scalable architecture, dynamic content management, and a responsive user experience with a developer-oriented design language.
-
-🌐 **Live Demo:** [naz-blog.vercel.app](https://naz-blog.vercel.app)
+The system is designed around modular content delivery, role-based access control, and database-driven dynamic rendering.
 
 ---
 
-## 📸 Preview
+#  System Overview
 
-> Add screenshots here later for:
+The application is structured as a server-first web platform:
 
-* Homepage
-* Blog page
-* Admin dashboard
-* Comment system
-* Mobile responsive layout
-
----
-
-#  Features
-
-* Built with the modern **Next.js App Router** architecture
-* Fully responsive UI optimized for desktop, tablet, and mobile devices
-* Secure authentication system powered by **Supabase Auth**
-* Dynamic markdown-based blogging system
-* Advanced nested comment system
-
-  * Replies
-  * Likes
-  * Comment editing & deletion
-  * Moderation support
-* Admin dashboard for:
-
-  * Blog management
-  * Project management
-  * Comment moderation
-* JSON-driven project architecture
-* Profanity filtering for user-generated content
-* SEO-friendly structure and server-side rendering support
+* Server Components handle initial rendering and data fetching
+* Client Components manage interactive UI layers
+* Supabase provides authentication and persistent relational storage
+* Markdown + metadata layer drives blog content
+* JSON-based schema drives project portfolio rendering
 
 ---
 
-#  Motivation
+#  Architecture
 
-I built this project to explore scalable full-stack architecture while creating a fully customizable blogging platform.
+## High-Level Flow
 
-The project helped me improve my skills in:
-
-* authentication systems
-* database design
-* dynamic routing
-* markdown rendering
-* state management
-* responsive UI development
-
----
-
-#  Tech Stack
-
-## Frontend
-
-* Next.js
-* React
-* TypeScript
-* TailwindCSS
-* CSS Modules
-* Font Awesome
-
-## Backend & Infrastructure
-
-* Supabase
-
-  * PostgreSQL Database
-  * Authentication
-* Vercel Deployment
-
-## Content Processing
-
-* gray-matter
-* react-markdown
-
----
-
-# 📁 Project Structure
-
-```text
-├── app/                  # Next.js App Router
-│   ├── admin/            # Admin dashboard
-│   ├── blog/             # Blog pages & dynamic routes
-│   ├── profile/          # User profiles
-│   ├── api/              # API route handlers
-│   └── layout.tsx        # Global layout
-│
-├── components/           # Reusable UI components
-├── lib/                  # Utilities & Supabase configuration
-├── content/              # Markdown blog posts
-├── data/                 # JSON-based project data
-└── public/               # Static assets
+```
+Client Request
+   ↓
+Next.js App Router (Server Components)
+   ↓
+Data Layer (Supabase / Markdown / JSON)
+   ↓
+Rendering Layer (React Server + Client Components)
+   ↓
+Hydrated UI (Client Interactivity)
 ```
 
 ---
 
-# ⚙️ Getting Started
+## Data Sources
 
-## 1. Clone the Repository
+### 1. Authentication Layer (Supabase Auth)
 
-```bash
+* Email-based authentication
+* Session-based user state
+* Role differentiation (user / admin)
+
+### 2. Database Layer (PostgreSQL via Supabase)
+
+Core tables:
+
+* users
+* posts
+* comments
+* likes
+* projects
+
+### 3. Content Layer
+
+* Markdown posts (`gray-matter` parsing)
+* Frontmatter-driven metadata
+* Static + dynamic hybrid rendering
+
+---
+
+#  Comment System Architecture
+
+Nested comment system implemented using adjacency list model:
+
+* `parent_id` → recursive threading
+* depth-based UI indentation
+* optimistic UI updates
+* moderation flags
+
+Supported operations:
+
+* create comment
+* edit comment
+* delete comment (soft delete recommended)
+* like/unlike
+* threaded replies (N-level recursion)
+
+---
+
+#  Security Model
+
+* Supabase Row Level Security (RLS) policies
+* Auth-gated API routes
+* Admin-only mutation endpoints
+* Input sanitization layer (profanity filter)
+* Client-side validation + server-side enforcement
+
+---
+
+#  Rendering Strategy
+
+## Hybrid Rendering Model
+
+| Route Type   | Strategy                               |
+| ------------ | -------------------------------------- |
+| Blog posts   | Static generation (SSG) + revalidation |
+| Admin panel  | Client-side rendering (CSR)            |
+| User profile | Server-side rendering (SSR)            |
+| Comments     | ISR + client hydration                 |
+
+---
+
+#  Performance Considerations
+
+* App Router streaming enabled
+* Component-level code splitting
+* Lazy hydration for comment system
+* Minimal client JS footprint for blog pages
+* Edge-optimized deployment via Vercel
+
+---
+
+#  Project Structure
+
+```text id="proj_structure"
+app/
+ ├── admin/        # Admin dashboard (CSR)
+ ├── blog/         # Dynamic blog routes (SSG/ISR)
+ ├── profile/      # User profile (SSR)
+ ├── api/          # Route handlers (server logic)
+ └── layout.tsx    # Root layout
+
+components/
+ ├── ui/           # Atomic UI components
+ ├── blog/         # Blog-specific components
+ ├── comments/     # Comment system UI
+
+lib/
+ ├── supabase/     # DB client + auth helpers
+ ├── utils/        # helper functions
+
+content/
+ ├── posts/*.md    # Markdown-based posts
+
+data/
+ ├── projects.json # Portfolio schema
+```
+
+---
+
+#  API Layer
+
+REST-like internal API routes:
+
+* `POST /api/comment/create`
+* `POST /api/comment/delete`
+* `POST /api/comment/like`
+* `POST /api/post/create` (admin only)
+
+All routes:
+
+* validated via Supabase session
+* protected with role checks
+* sanitized input layer
+
+---
+
+#  Local Development
+
+```bash id="dev_setup"
 git clone https://github.com/your-username/naz-blog.git
 cd naz-blog
-```
-
-## 2. Install Dependencies
-
-```bash
 npm install
 ```
 
-## 3. Environment Variables
-
-Create a `.env.local` file in the root directory:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```env id="env"
+NEXT_PUBLIC_SUPABASE_URL=xxx
+NEXT_PUBLIC_SUPABASE_ANON_KEY=xxx
 ```
 
-## 4. Run the Development Server
-
-```bash
+```bash id="run_dev"
 npm run dev
 ```
 
-Open `http://localhost:3000` in your browser.
+---
+
+# 📊 Design Decisions
+
+* Supabase chosen over custom backend to reduce infrastructure overhead
+* Markdown used to separate content from UI logic
+* App Router used for server-first architecture
+* Hybrid rendering chosen for balancing SEO + interactivity
 
 ---
 
-#  About the Developer
+#  Author
 
 Naz İçen
+Computer Programming Student
 
-Computer Programming student focused on:
+Focus areas:
 
-* Full-stack web development
-* Desktop software engineering
-* Game development
+* full-stack web systems
+* UI architecture
+* game development systems (Unity/C#)
+* desktop tooling & low-level Windows development
 
-Interested in:
 
-* scalable architectures
-* modern UI systems
-* performance-focused applications
-* low-level Windows technologies
-
----
-
-# 📄 License
-
-This project is licensed under the MIT License.
+ (She hasn't chosen a field yet :p ) 
