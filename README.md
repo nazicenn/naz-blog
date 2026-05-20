@@ -10,6 +10,8 @@ A full-stack blog and portfolio system built with a server-centric architecture 
 
 The system is designed around modular content delivery, role-based access control, and database-driven dynamic rendering.
 
+**[ LIVE DEMO](https://naz-blog.vercel.app)** 
+
 ---
 
 #  System Overview
